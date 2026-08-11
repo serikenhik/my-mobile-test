@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#090807">
+  <title>Дом без окон — текстовая хоррор-игра</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=PT+Serif:wght@400;700&display=swap');
+    :root{--ink:#e8e1d5;--muted:#918b82;--blood:#a51620;--ember:#e96d30;--panel:rgba(16,14,12,.92);--line:rgba(232,225,213,.14);--black:#090807}
+    *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#090807;color:var(--ink)}
+    body{font-family:"PT Serif",Georgia,serif;background-image:radial-gradient(circle at 50% -20%,#3b2722 0,transparent 38%),linear-gradient(rgba(0,0,0,.35),rgba(0,0,0,.92)),repeating-linear-gradient(90deg,transparent 0 64px,rgba(255,255,255,.012) 65px);overflow-x:hidden}
+    body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.24;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.16'/%3E%3C/svg%3E")}
+    button{font:inherit}.app{width:min(1180px,calc(100% - 32px));margin:auto;padding:28px 0 54px;position:relative}
+    header{display:flex;align-items:flex-end;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:18px;margin-bottom:24px;gap:20px}
+    .brand small,.eyebrow{font-family:Oswald,sans-serif;text-transform:uppercase;letter-spacing:.28em;color:var(--ember);font-size:11px}.brand h1{font-family:Oswald,sans-serif;text-transform:uppercase;letter-spacing:.06em;font-size:clamp(30px,5vw,58px);line-height:.9;margin:8px 0 0}.brand h1 span{color:var(--blood)}
+    .header-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.icon-btn{border:1px solid var(--line);background:#15120f;color:var(--muted);padding:10px 13px;cursor:pointer;text-transform:uppercase;font-family:Oswald,sans-serif;letter-spacing:.08em;font-size:11px}.icon-btn:hover{color:var(--ink);border-color:#5b5047}.icon-btn.danger:hover{border-color:var(--blood);color:#ffafb4}
+    .layout{display:grid;grid-template-columns:245px 1fr;gap:22px}.sidebar,.story{border:1px solid var(--line);background:var(--panel);box-shadow:0 24px 80px #000}
+    .sidebar{padding:18px;height:max-content;position:sticky;top:18px}.stat{margin-bottom:18px}.stat-head{display:flex;justify-content:space-between;font-family:Oswald,sans-serif;text-transform:uppercase;letter-spacing:.12em;font-size:11px;color:var(--muted);margin-bottom:8px}.bar{height:7px;background:#29231e;overflow:hidden}.fill{height:100%;transition:width .5s ease;background:linear-gradient(90deg,#711018,var(--blood))}.fill.fear{background:linear-gradient(90deg,#614113,var(--ember))}
+    .meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:20px 0}.meta div{background:#0d0b0a;border:1px solid var(--line);padding:10px}.meta span{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;font-family:Oswald,sans-serif;letter-spacing:.12em}.meta b{font-family:Oswald,sans-serif;font-size:18px}
+    .side-title{font-family:Oswald,sans-serif;text-transform:uppercase;letter-spacing:.16em;font-size:11px;color:var(--muted);margin:20px 0 10px}.inventory{display:flex;flex-wrap:wrap;gap:7px}.item{border:1px solid #514339;background:#211a16;padding:7px 9px;font-size:12px}.empty{font-style:italic;color:#655f58;font-size:13px}.progress{font-family:Oswald,sans-serif;font-size:26px}.progress span{color:var(--muted);font-size:13px}
+    .story{min-height:650px;position:relative;overflow:hidden}.story:before{content:"";position:absolute;inset:0;background:linear-gradient(110deg,rgba(165,22,32,.07),transparent 38%);pointer-events:none}.scene{padding:clamp(25px,5vw,58px);position:relative}.room{display:flex;align-items:center;gap:12px;color:var(--muted);font-family:Oswald,sans-serif;text-transform:uppercase;letter-spacing:.19em;font-size:11px}.room:before{content:"";width:28px;height:1px;background:var(--blood)}
+    h2{font-family:Oswald,sans-serif;text-transform:uppercase;letter-spacing:.035em;font-weight:500;font-size:clamp(30px,5vw,54px);line-height:1.02;margin:16px 0 18px;max-width:760px}.text{font-size:clamp(16px,2vw,19px);line-height:1.75;color:#c9c0b4;max-width:780px;white-space:pre-line;min-height:112px}.choices{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:32px}.choice{position:relative;text-align:left;padding:18px 18px 18px 58px;min-height:74px;border:1px solid var(--line);background:#12100e;color:var(--ink);cursor:pointer;transition:.2s}.choice:hover:not(:disabled){transform:translateY(-2px);border-color:#8b332e;background:#1b1512}.choice:disabled{opacity:.38;cursor:not-allowed}.letter{position:absolute;left:18px;top:17px;width:26px;height:26px;display:grid;place-items:center;border:1px solid #68312d;color:#e57c65;font-family:Oswald,sans-serif}.choice small{display:block;margin-top:5px;color:#736c64;font-size:11px}.toast{position:fixed;right:22px;bottom:22px;background:#211713;border-left:3px solid var(--ember);padding:13px 17px;box-shadow:0 12px 40px #000;opacity:0;transform:translateY(10px);transition:.25s;pointer-events:none;z-index:9}.toast.show{opacity:1;transform:none}
+    .ending{border-color:#6e1e22}.ending h2{color:#e5b5ae}.ending-number{font:500 12px Oswald,sans-serif;letter-spacing:.2em;color:var(--blood);text-transform:uppercase}.ending-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:28px}.primary{background:var(--blood);border:1px solid #d4494f;color:white;padding:13px 18px;cursor:pointer;font:500 12px Oswald,sans-serif;text-transform:uppercase;letter-spacing:.1em}.secondary{background:transparent;border:1px solid var(--line);color:var(--ink);padding:13px 18px;cursor:pointer;font:500 12px Oswald,sans-serif;text-transform:uppercase;letter-spacing:.1em}
+    dialog{width:min(760px,calc(100% - 24px));max-height:82vh;background:#12100e;color:var(--ink);border:1px solid #4b3d35;padding:0;box-shadow:0 30px 120px #000}dialog::backdrop{background:rgba(0,0,0,.82)}.modal-head{position:sticky;top:0;background:#171310;border-bottom:1px solid var(--line);padding:18px 22px;display:flex;justify-content:space-between;align-items:center;z-index:2}.modal-head h3{font:500 22px Oswald,sans-serif;text-transform:uppercase;margin:0}.close{background:none;border:0;color:var(--muted);font-size:24px;cursor:pointer}.modal-body{padding:22px}.ending-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.ending-card{border:1px solid var(--line);padding:14px;background:#0c0a09}.ending-card.locked{color:#4e4944}.ending-card b{display:block;font-family:Oswald,sans-serif;text-transform:uppercase}.ending-card small{color:var(--muted)}.journal-entry{border-left:2px solid #462b26;padding:4px 0 4px 14px;margin:0 0 15px;color:#a69d93}.journal-entry b{display:block;color:#d0c6ba;font-family:Oswald,sans-serif;text-transform:uppercase;font-size:12px}
+    @media(max-width:780px){.layout{grid-template-columns:1fr}.sidebar{position:static;display:grid;grid-template-columns:1fr 1fr;gap:0 18px}.side-section{grid-column:span 2}.choices{grid-template-columns:1fr}.story{min-height:auto}.scene{padding:25px 20px}.header-actions{justify-content:flex-start}header{align-items:flex-start;flex-direction:column}.ending-grid{grid-template-columns:1fr}}
+    @keyframes flicker{0%,93%,100%{opacity:1}94%{opacity:.7}95%{opacity:.95}97%{opacity:.55}}.brand{animation:flicker 8s infinite}
+  </style>
+</head>
+<body>
+<div class="app">
+  <header><div class="brand"><small>Интерактивная история</small><h1>Дом <span>без окон</span></h1></div><div class="header-actions"><button class="icon-btn" id="saveBtn">Сохранить</button><button class="icon-btn" id="loadBtn">Продолжить</button><button class="icon-btn" id="journalBtn">Журнал</button><button class="icon-btn" id="endingsBtn">Концовки</button><button class="icon-btn danger" id="resetBtn">Сначала</button></div></header>
+  <main class="layout">
+    <aside class="sidebar">
+      <div class="stat"><div class="stat-head"><span>Здоровье</span><b id="healthText">100</b></div><div class="bar"><div class="fill" id="healthBar"></div></div></div>
+      <div class="stat"><div class="stat-head"><span>Страх</span><b id="fearText">0</b></div><div class="bar"><div class="fill fear" id="fearBar"></div></div></div>
+      <div class="meta"><div><span>Ход</span><b id="turnText">0</b></div><div><span>Время</span><b id="timeText">00:17</b></div></div>
+      <div class="side-section"><div class="side-title">Инвентарь</div><div class="inventory" id="inventory"></div></div>
+      <div class="side-section"><div class="side-title">Найдено концовок</div><div class="progress"><b id="endingCount">0</b> <span>/ 25</span></div></div>
+    </aside>
+    <section class="story" id="story"></section>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+<dialog id="modal"><div class="modal-head"><h3 id="modalTitle"></h3><button class="close" id="closeModal" aria-label="Закрыть">×</button></div><div class="modal-body" id="modalBody"></div></dialog>
+<script>
+"use strict";
+const ITEM_NAMES={flashlight:"фонарь",key:"ржавый ключ",matches:"спички",photo:"фотография",knife:"нож",bell:"серебряный колокольчик",mirror:"осколок зеркала",rope:"верёвка",medicine:"аптечка",doll:"тряпичная кукла",tape:"кассета",amulet:"костяной амулет"};
+const storyData=[
+{id:"start",room:"Перед домом",title:"Дверь уже открыта",text:"Ливень стирает дорогу за твоей спиной. На холме стоит дом, которого нет ни на одной карте. Внутри тикают часы — хотя электричества здесь быть не должно.\n\nНа двери свежей краской выведено твоё имя.",choices:[
+ {letter:"A",text:"Войти через парадную дверь",next:"hall",effect:{fear:5}},
+ {letter:"B",text:"Обойти дом и спуститься в подвал",next:"basement",effect:{health:-5,add:"rope"}},
+ {letter:"C",text:"Разбить стекло боковой двери",next:"kitchen",effect:{health:-12,add:"knife"}},
+ {letter:"D",text:"Уйти обратно в лес",next:"e01",effect:{fear:10}}
+]},
+{id:"hall",room:"Главный холл",title:"Часы показывают 00:17",text:"Дверь захлопывается без звука. Лестница наверх покрыта мокрыми следами босых ног. Из гостиной доносится голос матери, умершей много лет назад. Под вешалкой лежит фонарь.",choices:[
+ {letter:"A",text:"Поднять фонарь и идти наверх",next:"upstairs",effect:{add:"flashlight",fear:4}},
+ {letter:"B",text:"Пойти на голос в гостиную",next:"parlor",effect:{fear:12}},
+ {letter:"C",text:"Осмотреть дверь и попытаться выйти",next:"e02"},
+ {letter:"D",text:"Открыть дверь под лестницей",next:"basement",effect:{add:"matches"}}
+]},
+{id:"kitchen",room:"Кухня",title:"Ужин ещё тёплый",text:"На столе четыре тарелки. В одной шевелятся чёрные волосы. Холодильник гудит, повторяя азбукой Морзе: «НЕ СМОТРИ В ПЕЧЬ». В стене видна узкая дверь кладовой.",choices:[
+ {letter:"A",text:"Съесть кусок хлеба",next:"e03",effect:{health:10}},
+ {letter:"B",text:"Открыть холодильник",next:"coldroom",effect:{add:"medicine",fear:8}},
+ {letter:"C",text:"Заглянуть в печь",next:"e04",effect:{fear:35}},
+ {letter:"D",text:"Войти в кладовую",next:"pantry",effect:{fear:6}}
+]},
+{id:"basement",room:"Подвал",title:"Под полом кто-то считает",text:"Лестница заканчивается в воде. На стене двадцать пять имён, двадцать четыре зачёркнуты. Последнее — твоё. За котлом тянется тоннель, а в центре подвала стоит красная дверь без ручки.",choices:[
+ {letter:"A",text:"Идти по тоннелю",next:"well",effect:{health:-8,fear:8}},
+ {letter:"B",text:"Постучать в красную дверь четыре раза",next:"redroom",effect:{fear:12}},
+ {letter:"C",text:"Прочитать все имена вслух",next:"e05",effect:{fear:30}},
+ {letter:"D",text:"Подняться обратно в холл",next:"hall",effect:{fear:3}}
+]},
+{id:"upstairs",room:"Верхний коридор",title:"Комнаты меняются местами",text:"Фонарь выхватывает три двери: детскую, спальню и ванную. В конце коридора твоё отражение стоит спиной к тебе. Оно поднимает руку раньше, чем ты.",choices:[
+ {letter:"A",text:"Войти в детскую",next:"nursery",effect:{fear:8}},
+ {letter:"B",text:"Открыть спальню",next:"bedroom",effect:{fear:5}},
+ {letter:"C",text:"Зайти в ванную",next:"bathroom",effect:{fear:6}},
+ {letter:"D",text:"Подойти к отражению",next:"e06",effect:{fear:25}}
+]},
+{id:"parlor",room:"Гостиная",title:"Семейный портрет",text:"У камина сидит женщина с лицом твоей матери, но её пальцы слишком длинные. Над ней висит фотография: ты стоишь у этого дома в 1987 году — за десятилетия до своего рождения.",choices:[
+ {letter:"A",text:"Назвать женщину мамой",next:"e07",effect:{fear:-10}},
+ {letter:"B",text:"Бросить фотографию в камин",next:"fireplace",effect:{fear:8}},
+ {letter:"C",text:"Забрать фотографию и молчать",next:"dining",effect:{add:"photo",fear:4}},
+ {letter:"D",text:"Спросить: «Кто я?»",next:"e08",effect:{fear:20}}
+]},
+{id:"pantry",room:"Кладовая",title:"Стена дышит",text:"Полки забиты банками с датами. В банке с сегодняшним числом плавает человеческий глаз. За мешками найден лаз, ведущий в старую часовню. На гвозде висит серебряный колокольчик.",choices:[
+ {letter:"A",text:"Взять колокольчик и пролезть в лаз",next:"chapel",effect:{add:"bell",fear:5}},
+ {letter:"B",text:"Разбить банку с сегодняшней датой",next:"e09",effect:{health:-15}},
+ {letter:"C",text:"Замуровать лаз мешками",next:"e10"},
+ {letter:"D",text:"Вернуться на кухню",next:"kitchen"}
+]},
+{id:"coldroom",room:"Холодильная камера",title:"Сердце дома",text:"За дверцей холодильника оказывается комната. С потолка свисают пустые оболочки людей. В ледяной нише бьётся огромное сердце, оплетённое проводами. Рядом лежит кассета с надписью «СЕАНС 25».",choices:[
+ {letter:"A",text:"Перерезать провода ножом",next:"e11",requires:"knife",locked:"Нужен нож"},
+ {letter:"B",text:"Забрать кассету",next:"dining",effect:{add:"tape",health:-5}},
+ {letter:"C",text:"Коснуться сердца",next:"e12",effect:{fear:25}},
+ {letter:"D",text:"Закрыть дверь и уйти в холл",next:"hall",effect:{fear:5}}
+]},
+{id:"nursery",room:"Детская",title:"Кукла знает твоё имя",text:"Музыкальная карусель вращается сама. На кровати сидит тряпичная кукла с пришитым к груди числом 25. Детский голос из шкафа просит открыть дверь до того, как закончится мелодия.",choices:[
+ {letter:"A",text:"Открыть шкаф",next:"e13",effect:{fear:25}},
+ {letter:"B",text:"Взять куклу и остановить карусель",next:"attic",effect:{add:"doll",fear:6}},
+ {letter:"C",text:"Сжечь куклу спичками",next:"e14",requires:"matches",locked:"Нужны спички"},
+ {letter:"D",text:"Позвонить в колокольчик",next:"chapel",requires:"bell",locked:"Нужен колокольчик"}
+]},
+{id:"bedroom",room:"Спальня хозяина",title:"Кровать помнит тебя",text:"На подушке лежит свежая вмятина. В тумбочке — дневник доктора Воронова: «Дом строится из воспоминаний пациента. Если он поймёт, что мёртв, цикл прекратится». Под кроватью кто-то тихо плачет.",choices:[
+ {letter:"A",text:"Лечь и закрыть глаза",next:"e15",effect:{fear:-20}},
+ {letter:"B",text:"Заглянуть под кровать",next:"attic",effect:{health:-10,add:"key"}},
+ {letter:"C",text:"Разорвать дневник",next:"e16",effect:{fear:15}},
+ {letter:"D",text:"Принять лекарство и читать дальше",next:"truth",requires:"medicine",locked:"Нужна аптечка",effect:{health:15,fear:-15}}
+]},
+{id:"bathroom",room:"Ванная",title:"Зеркало запотело изнутри",text:"В ванне чёрная вода. На зеркале появляется надпись: «ОТДАЙ МНЕ ЛИЦО — Я ПОКАЖУ ВЫХОД». В сливе блестит костяной амулет.",choices:[
+ {letter:"A",text:"Согласиться на обмен",next:"e17",effect:{fear:25}},
+ {letter:"B",text:"Разбить зеркало и взять осколок",next:"attic",effect:{health:-8,add:"mirror"}},
+ {letter:"C",text:"Достать амулет из слива",next:"chapel",effect:{add:"amulet",fear:10}},
+ {letter:"D",text:"Погрузить голову в воду",next:"e18",effect:{health:-30}}
+]},
+{id:"dining",room:"Столовая",title:"Двадцать четыре гостя",text:"За длинным столом сидят неподвижные люди. У каждого зачёркнуто лицо. Свободный стул подписан твоим именем. Старый магнитофон ждёт кассету, а дверь в часовню заперта ржавым замком.",choices:[
+ {letter:"A",text:"Сесть на своё место",next:"e19",effect:{fear:20}},
+ {letter:"B",text:"Вставить кассету в магнитофон",next:"truth",requires:"tape",locked:"Нужна кассета"},
+ {letter:"C",text:"Открыть дверь ржавым ключом",next:"chapel",requires:"key",locked:"Нужен ржавый ключ"},
+ {letter:"D",text:"Показать гостям фотографию",next:"e20",requires:"photo",locked:"Нужна фотография"}
+]},
+{id:"fireplace",room:"За камином",title:"Дым идёт вниз",text:"Пламя открывает проход. Внутри стены проложены кабели, а кирпичи тёплые, как кожа. Лестница ведёт на чердак. Внизу слышен гул сердца дома.",choices:[
+ {letter:"A",text:"Подняться на чердак",next:"attic",effect:{health:-5}},
+ {letter:"B",text:"Спуститься к сердцу",next:"coldroom",effect:{fear:5}},
+ {letter:"C",text:"Задушить огонь и остаться в стене",next:"e21"},
+ {letter:"D",text:"Позвать женщину из гостиной",next:"e07"}
+]},
+{id:"well",room:"Колодец под домом",title:"Вода отражает небо",text:"Тоннель выводит к колодцу, над которым нет земли и потолка — только ночное небо. Верёвка уходит во тьму. Снизу голосом ребёнка кто-то говорит: «Ты создал нас. Теперь спускайся».",choices:[
+ {letter:"A",text:"Спуститься по верёвке",next:"e22",requires:"rope",locked:"Нужна верёвка"},
+ {letter:"B",text:"Бросить в воду амулет",next:"chapel",requires:"amulet",locked:"Нужен амулет"},
+ {letter:"C",text:"Посветить фонарём на дно",next:"truth",requires:"flashlight",locked:"Нужен фонарь",effect:{fear:12}},
+ {letter:"D",text:"Прыгнуть в колодец",next:"e23",effect:{health:-100}}
+]},
+{id:"redroom",room:"Красная комната",title:"Наблюдатель проснулся",text:"За дверью — лаборатория. Мониторы показывают все комнаты сразу. В кресле сидит твоё тело, опутанное проводами. На экране вопрос: «ЗАВЕРШИТЬ ИСПЫТАНИЕ ИЛИ СОХРАНИТЬ ДОМ?»",choices:[
+ {letter:"A",text:"Нажать «Завершить испытание»",next:"truth",effect:{fear:10}},
+ {letter:"B",text:"Нажать «Сохранить дом»",next:"e24"},
+ {letter:"C",text:"Разбить монитор зеркалом",next:"e25",requires:"mirror",locked:"Нужен осколок зеркала"},
+ {letter:"D",text:"Вернуться в подвал",next:"basement",effect:{fear:5}}
+]},
+{id:"attic",room:"Чердак",title:"Модель дома",text:"Под крышей стоит точная модель особняка. Внутри крошечный ты повторяет каждое движение. У модели нет окон. Рядом четыре рычага: «ОГОНЬ», «ПАМЯТЬ», «СОН», «ПРОБУЖДЕНИЕ».",choices:[
+ {letter:"A",text:"Потянуть рычаг «Огонь»",next:"e11"},
+ {letter:"B",text:"Потянуть рычаг «Память»",next:"truth",effect:{fear:18}},
+ {letter:"C",text:"Потянуть рычаг «Сон»",next:"e15"},
+ {letter:"D",text:"Потянуть рычаг «Пробуждение»",next:"finalChoice"}
+]},
+{id:"chapel",room:"Домовая часовня",title:"Колокол без языка",text:"На алтаре вырезано: «Дом отпускает только того, кто оставит ему настоящее имя». Витраж изображает тебя в белом халате у больничной койки. Под алтарём есть место для куклы и амулета.",choices:[
+ {letter:"A",text:"Назвать дому своё настоящее имя",next:"finalChoice",effect:{fear:-10}},
+ {letter:"B",text:"Положить куклу на алтарь",next:"e13",requires:"doll",locked:"Нужна кукла"},
+ {letter:"C",text:"Разбить витраж колокольчиком",next:"truth",requires:"bell",locked:"Нужен колокольчик"},
+ {letter:"D",text:"Положить амулет под алтарь",next:"e10",requires:"amulet",locked:"Нужен амулет"}
+]},
+{id:"truth",room:"Комната памяти",title:"Ты построил этот дом",text:"Воспоминание возвращается целиком. Ты — доктор Воронов. Двадцать четыре пациента погибли в созданной тобой симуляции страха. После аварии двадцать пятым пациентом стал ты сам. Дом — не место. Это машина, которая учится на каждом твоём ужасе.\n\nОна предлагает последний выбор.",choices:[
+ {letter:"A",text:"Признать вину и разбудить остальных",next:"finalChoice",effect:{fear:-20}},
+ {letter:"B",text:"Стереть свою память ещё раз",next:"e16"},
+ {letter:"C",text:"Стать новым смотрителем дома",next:"e24"},
+ {letter:"D",text:"Уничтожить систему вместе с собой",next:"e25"}
+]},
+{id:"finalChoice",room:"Нулевая комната",title:"Выход существует",text:"Перед тобой четыре двери. Белая ведёт наружу, но выпустит дом в мир. Чёрная закроет симуляцию навсегда вместе с тобой. Красная вернёт тебя в начало. Последняя дверь не имеет цвета — за ней слышны голоса погибших.",choices:[
+ {letter:"A",text:"Открыть белую дверь",next:"e01"},
+ {letter:"B",text:"Открыть чёрную дверь",next:"e25"},
+ {letter:"C",text:"Открыть красную дверь",next:"start",effect:{fear:15}},
+ {letter:"D",text:"Войти в бесцветную дверь",next:"e20"}
+]},
+{id:"e01",ending:1,title:"Дом выходит вместе с тобой",text:"Ты находишь дорогу и видишь утренний город. В каждом окне теперь стоит один и тот же тёмный силуэт. Ты выбрался, но дом научился быть везде."},
+{id:"e02",ending:2,title:"Дверь, которой не было",text:"Ты распахиваешь входную дверь и делаешь шаг. С другой стороны — тот же холл. Затем ещё один. И ещё. Дом превращает твою надежду в бесконечный коридор."},
+{id:"e03",ending:3,title:"Последний ужин",text:"Хлеб напоминает вкус детства. Ты не замечаешь, как садишься за стол. Когда приходишь в себя, перед тобой уже лежит новая тарелка, а на двери появляется имя следующего гостя."},
+{id:"e04",ending:4,title:"То, что живёт в печи",text:"Из золы открывается огромный глаз. Он узнаёт тебя. Печь захлопывается, и дом впервые за двадцать пять лет становится по-настоящему тёплым."},
+{id:"e05",ending:5,title:"Хор двадцати четырёх",text:"Каждое произнесённое имя возвращает один голос. Последнее имя произносят уже они — твоё. Утром в подвале появляется двадцать пятая зачёркнутая строка."},
+{id:"e06",ending:6,title:"Человек по ту сторону",text:"Отражение поворачивается. У него нет лица. Оно выходит из зеркала, а ты остаёшься за холодным стеклом — повторять его движения с едва заметным опозданием."},
+{id:"e07",ending:7,title:"Мама ждала",text:"Женщина обнимает тебя. Её руки становятся стенами, голос — скрипом балок. Ты наконец понимаешь: дом не заманил тебя. Он просто хотел, чтобы ребёнок вернулся домой."},
+{id:"e08",ending:8,title:"Неправильный вопрос",text:"Женщина улыбается: «Ты — комната». Твоё тело распадается на двери, лестницы и пустые стены. Новый гость входит внутрь тебя ровно в 00:17."},
+{id:"e09",ending:9,title:"Сегодняшняя дата",text:"Глаз в банке моргает. Мир темнеет, а затем возвращается — с другой стороны стекла. На полке уже стоит банка с завтрашней датой."},
+{id:"e10",ending:10,title:"Замурованный страх",text:"Ты закрываешь проход и произносишь молитву. Дом затихает. Спустя годы стену вскрывают новые владельцы и находят внутри человека, который всё ещё шепчет твоим голосом."},
+{id:"e11",ending:11,title:"Пожар не очищает",text:"Огонь проходит по проводам и пожирает комнаты. Ты смеёшься, пока не замечаешь: пламя горит внутри твоих вен. Дом исчезает, но его фундамент остаётся в твоей памяти."},
+{id:"e12",ending:12,title:"Пульс",text:"Сердце подстраивается под твой ритм. Один удар. Второй. На третьем твоё сердце останавливается, а дом впервые делает глубокий вдох."},
+{id:"e13",ending:13,title:"Ребёнок номер двадцать пять",text:"Шкаф открывается в солнечную детскую. Ты становишься маленьким, а взрослая жизнь кажется страшным сном. Дверь запирается. Карусель начинает мелодию сначала."},
+{id:"e14",ending:14,title:"Пепельная девочка",text:"Кукла горит молча. Потом детский смех раздаётся у тебя за спиной. Наутро от дома остаётся пепел и одна новая тряпичная кукла с твоими глазами."},
+{id:"e15",ending:15,title:"Самый спокойный сон",text:"Матрас принимает форму твоего тела. Тиканье стихает. Ты спишь без сновидений, пока десятилетия проходят снаружи, а дом бережно дышит за тебя."},
+{id:"e16",ending:16,title:"Ещё одна попытка",text:"Страницы становятся белыми. Вместе с буквами исчезают имя, вина и страх. Ты стоишь под дождём перед незнакомым домом. На двери свежей краской выведено твоё имя."},
+{id:"e17",ending:17,title:"Лицо напрокат",text:"Зеркало забирает твоё лицо и действительно показывает выход. Через неделю в городе появляется человек с твоей внешностью. Он покупает участок на холме."},
+{id:"e18",ending:18,title:"Чёрная вода",text:"Под водой нет дна. Ты вспоминаешь все жизни, прожитые в доме, и понимаешь: утонуть здесь невозможно. Можно лишь бесконечно забывать, как дышать."},
+{id:"e19",ending:19,title:"Место за столом",text:"Гости поднимают головы. Под зачёркнутыми лицами — двадцать четыре версии тебя. Когда часы бьют один раз, твоё лицо исчезает последним."},
+{id:"e20",ending:20,title:"Прощение мёртвых",text:"Фотография возвращает гостям лица. Они уходят один за другим, не прощая и не обвиняя. Последний оставляет дверь открытой. На рассвете дом впервые оказывается пуст."},
+{id:"e21",ending:21,title:"Между стен",text:"Ты остаёшься в безопасной темноте. Шаги новых жильцов проходят совсем рядом. Ты стучишь, кричишь, царапаешь кирпичи — и постепенно понимаешь, чьи звуки слышал при входе."},
+{id:"e22",ending:22,title:"Небо под землёй",text:"Верёвка заканчивается среди звёзд. Ты отпускаешь руки и падаешь вверх. Дом уменьшается до точки, но в каждой звезде загорается окно, которого у него никогда не было."},
+{id:"e23",ending:23,title:"Короткий путь вниз",text:"Падение длится секунду и целую жизнь. На дне лежат двадцать четыре твоих тела. Ты становишься двадцать пятым — и слышишь, как наверху открывается входная дверь."},
+{id:"e24",ending:24,title:"Новый смотритель",text:"Мониторы подчиняются тебе. Ты обещаешь сделать испытание гуманнее. Когда появляется пациент номер двадцать шесть, твоя рука сама увеличивает уровень страха."},
+{id:"e25",ending:25,title:"Дом без хозяина",text:"Ты выключаешь систему. Комнаты гаснут одна за другой, мёртвые голоса замолкают. В последнюю секунду ты понимаешь: свобода — не всегда дверь наружу. Иногда это мужество закрыть дверь за собой."}
+];
+
+const sceneById=Object.fromEntries(storyData.map(scene=>[scene.id,scene]));
+let state={current:"start",health:100,fear:0,turn:0,time:17,inventory:[],journal:[],foundEndings:JSON.parse(localStorage.getItem("houseFoundEndings")||"[]")};
+const story=document.getElementById("story"),toast=document.getElementById("toast"),modal=document.getElementById("modal");
+function clamp(value,min,max){return Math.max(min,Math.min(max,value));}
+function showToast(message){toast.textContent=message;toast.classList.add("show");clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>toast.classList.remove("show"),2200);}
+function applyEffect(effect={}){if(effect.health)state.health=clamp(state.health+effect.health,0,100);if(effect.fear)state.fear=clamp(state.fear+effect.fear,0,100);if(effect.add&&!state.inventory.includes(effect.add)){state.inventory.push(effect.add);showToast("Получен предмет: "+ITEM_NAMES[effect.add]);}if(effect.remove)state.inventory=state.inventory.filter(item=>item!==effect.remove);}
+function choose(choice){if(choice.requires&&!state.inventory.includes(choice.requires))return;applyEffect(choice.effect);state.turn+=1;state.time+=3;if(state.health<=0&&choice.next!=="e23"){state.current="e23";}else if(state.fear>=100){state.current="e08";}else{state.current=choice.next;}const destination=sceneById[state.current];state.journal.push({room:destination.room||"Концовка",title:destination.title});if(state.journal.length>40)state.journal.shift();render();}
+function render(){const scene=sceneById[state.current];document.getElementById("healthText").textContent=state.health;document.getElementById("healthBar").style.width=state.health+"%";document.getElementById("fearText").textContent=state.fear;document.getElementById("fearBar").style.width=state.fear+"%";document.getElementById("turnText").textContent=state.turn;document.getElementById("timeText").textContent=String(Math.floor(state.time/60)).padStart(2,"0")+":"+String(state.time%60).padStart(2,"0");document.getElementById("inventory").innerHTML=state.inventory.length?state.inventory.map(item=>`<span class="item">${ITEM_NAMES[item]}</span>`).join(""):'<span class="empty">пусто</span>';
+ if(scene.ending){if(!state.foundEndings.includes(scene.ending)){state.foundEndings.push(scene.ending);state.foundEndings.sort((a,b)=>a-b);localStorage.setItem("houseFoundEndings",JSON.stringify(state.foundEndings));showToast("Открыта новая концовка");}story.classList.add("ending");story.innerHTML=`<div class="scene"><div class="ending-number">Концовка ${scene.ending} из 25</div><h2>${scene.title}</h2><div class="text">${scene.text}</div><div class="ending-actions"><button class="primary" onclick="restart()">Начать новый путь</button><button class="secondary" onclick="openEndings()">Все концовки</button></div></div>`;}else{story.classList.remove("ending");story.innerHTML=`<div class="scene"><div class="room">${scene.room}</div><h2>${scene.title}</h2><div class="text">${scene.text}</div><div class="choices">${scene.choices.map((choice,index)=>{const locked=choice.requires&&!state.inventory.includes(choice.requires);return `<button class="choice" ${locked?"disabled":""} onclick="choose(storyData.find(s=>s.id==='${scene.id}').choices[${index}])"><span class="letter">${choice.letter}</span>${choice.text}${locked?`<small>Закрыто: ${choice.locked}</small>`:""}</button>`;}).join("")}</div></div>`;}
+ document.getElementById("endingCount").textContent=state.foundEndings.length;}
+function restart(){const found=state.foundEndings;state={current:"start",health:100,fear:0,turn:0,time:17,inventory:[],journal:[{room:"Перед домом",title:"Дверь уже открыта"}],foundEndings:found};render();window.scrollTo({top:0,behavior:"smooth"});}
+function saveGame(){localStorage.setItem("houseSave",JSON.stringify(state));showToast("Игра сохранена");}
+function loadGame(){const saved=localStorage.getItem("houseSave");if(!saved){showToast("Сохранение не найдено");return;}try{const loaded=JSON.parse(saved);if(!sceneById[loaded.current])throw new Error();state=loaded;state.foundEndings=Array.from(new Set([...(state.foundEndings||[]),...JSON.parse(localStorage.getItem("houseFoundEndings")||"[]")])).sort((a,b)=>a-b);render();showToast("Сохранение загружено");}catch(error){showToast("Сохранение повреждено");}}
+function openEndings(){document.getElementById("modalTitle").textContent="25 концовок";document.getElementById("modalBody").innerHTML=`<div class="ending-grid">${storyData.filter(s=>s.ending).map(s=>{const found=state.foundEndings.includes(s.ending);return `<div class="ending-card ${found?"":"locked"}"><b>${String(s.ending).padStart(2,"0")} · ${found?s.title:"Неизвестная концовка"}</b><small>${found?s.text:"Продолжайте исследовать дом"}</small></div>`}).join("")}</div>`;modal.showModal();}
+function openJournal(){document.getElementById("modalTitle").textContent="Журнал пути";document.getElementById("modalBody").innerHTML=state.journal.length?state.journal.map((entry,index)=>`<div class="journal-entry"><b>${String(index+1).padStart(2,"0")} · ${entry.room}</b>${entry.title}</div>`).join(""):'<p class="empty">История ещё не началась.</p>';modal.showModal();}
+document.getElementById("saveBtn").onclick=saveGame;document.getElementById("loadBtn").onclick=loadGame;document.getElementById("journalBtn").onclick=openJournal;document.getElementById("endingsBtn").onclick=openEndings;document.getElementById("resetBtn").onclick=()=>{if(confirm("Начать заново? Открытые концовки сохранятся."))restart();};document.getElementById("closeModal").onclick=()=>modal.close();modal.addEventListener("click",event=>{if(event.target===modal)modal.close();});document.addEventListener("keydown",event=>{if(modal.open)return;const index=["a","b","c","d","ф","и","с","в"].indexOf(event.key.toLowerCase())%4;if(index>=0){const button=document.querySelectorAll(".choice")[index];if(button&&!button.disabled)button.click();}});
+state.journal=[{room:"Перед домом",title:"Дверь уже открыта"}];render();
+</script>
+</body>
+</html>
